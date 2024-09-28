@@ -8,6 +8,6 @@ final Logger logger = Logger(
       lineLength: 80,
       colors: true,
       printEmojis: false,
-      dateTimeFormat: DateTimeFormat.onlyTime,
+      // dateTimeFormat: DateTimeFormat.onlyTime,
   ),
 );

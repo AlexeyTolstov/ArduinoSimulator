@@ -12,12 +12,27 @@ class ConnectDevicesPage extends StatefulWidget {
 }
 
 class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
-  List<ItemWidget> itemWidgets = [
+  int? selectedContactId;
+
+  late List<ItemWidget> itemWidgets = [
     ItemWidget(
       id: 0,
       image: AppDevicesImages.lightRedOff,
       nameDevice: "Красный светодиод",
-      contacts: [],
+      contacts: [
+        Contact(
+          id: 0,
+          name: "GND",
+          pos: Position(left: 6, bottom: 0),
+          onTap: () => changeSelected(0),
+        ),
+        Contact(
+          id: 1,
+          name: "VCC",
+          pos: Position(right: 5, bottom: 0),
+          onTap: () => changeSelected(1),
+        ),
+      ],
     ),
     ItemWidget(
       id: 1,
@@ -26,6 +41,18 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
       contacts: [],
     )
   ];
+
+  void changeSelected(int? id) {
+    setState(() {
+      selectedContactId = id;
+
+      for (int i = 0; i < itemWidgets[0].contacts.length; i++) {
+        itemWidgets[0].contacts[i].isSelected =
+            itemWidgets[0].contacts[i].id == selectedContactId;
+      }
+    });
+    logger.i("Changing on $selectedContactId");
+  }
 
   void resetItems() {
     setState(() {
@@ -37,6 +64,10 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
 
   @override
   Widget build(BuildContext context) {
+    for (Contact i in itemWidgets[0].contacts) {
+      logger.i("${i.id}, ${i.isSelected}");
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Simulator"),
@@ -68,14 +99,15 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                             onDragEnd: (details) {
                               setState(() {
                                 item.isDragged = true;
-                                item.x = details.offset.dx - MediaQuery.sizeOf(context).width / 4;
-                                item.y = details.offset.dy - AppBar().preferredSize.height;
-                              
-                                if (item.x < 0){
+                                item.x = details.offset.dx -
+                                    MediaQuery.sizeOf(context).width / 4;
+                                item.y = details.offset.dy -
+                                    AppBar().preferredSize.height;
+
+                                if (item.x < 0) {
                                   item.x = 0;
                                   item.isDragged = false;
                                 }
-                                logger.i("hello world");
                               });
                             },
                           ),
@@ -92,25 +124,22 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                     if (i.id == details.data.id) return;
                   }
 
-                  itemWidgets.add(
-                    ItemWidget(
-                      id: details.data.id,
-                      image: details.data.image,
-                      nameDevice: details.data.nameDevice,
-                      contacts: details.data.contacts,
-
-                      x: details.offset.dx - MediaQuery.sizeOf(context).width / 4,
-                      y: details.offset.dy - AppBar().preferredSize.height,
-                      isDragged: true,
-                    )
-                  );
+                  itemWidgets.add(ItemWidget(
+                    id: details.data.id,
+                    image: details.data.image,
+                    nameDevice: details.data.nameDevice,
+                    contacts: details.data.contacts,
+                    x: details.offset.dx - MediaQuery.sizeOf(context).width / 4,
+                    y: details.offset.dy - AppBar().preferredSize.height,
+                    isDragged: true,
+                  ));
                 });
               },
               builder: (context, candidateData, rejectedData) {
                 return Stack(
                   children: itemWidgets.map((item) {
                     if (!item.isDragged) return Container();
-            
+
                     return Positioned(
                       left: item.x,
                       top: item.y,
@@ -123,10 +152,12 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                         childWhenDragging: Container(),
                         onDragEnd: (details) {
                           setState(() {
-                            item.x = details.offset.dx - MediaQuery.sizeOf(context).width / 4;
-                            item.y = details.offset.dy - AppBar().preferredSize.height;
+                            item.x = details.offset.dx -
+                                MediaQuery.sizeOf(context).width / 4;
+                            item.y = details.offset.dy -
+                                AppBar().preferredSize.height;
 
-                            if (item.x < 0){
+                            if (item.x < 0) {
                               item.x = 0;
                               item.isDragged = false;
                             }

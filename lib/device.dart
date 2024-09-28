@@ -1,5 +1,22 @@
+import 'package:arduino_simulator_test/styles/colors.dart';
 import 'package:arduino_simulator_test/styles/widgets_styles.dart';
 import 'package:flutter/material.dart';
+
+
+class Position{
+  final double? top;
+  final double? bottom;
+  final double? left;
+  final double? right;
+
+  Position({
+    this.top,
+    this.bottom,
+    this.left,
+    this.right,
+  });
+}
+
 
 class ItemWidget {
   final int id;
@@ -11,6 +28,8 @@ class ItemWidget {
   double x, y;  
   bool isDragged;
 
+  late final double width, height;
+  
   ItemWidget({
     required this.id,
     required this.image,
@@ -19,7 +38,10 @@ class ItemWidget {
     this.x = 0,
     this.y = 0,
     this.isDragged = false,
-  });
+  }){
+    width = image.width ?? 0;
+    height = image.height ?? 0;
+  }
 
   Widget itemWidget(){
     return Padding(
@@ -28,6 +50,7 @@ class ItemWidget {
         children: [
           SizedBox(
             width: 200,
+            height: 200,
             child: image
           ),
           Expanded(
@@ -42,7 +65,18 @@ class ItemWidget {
   }
 
   Widget widget(){
-    return image;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Stack(
+        children: [
+          image,
+          
+          ...contacts.map((Contact c) {
+            return c.widget();
+          }),
+        ],
+      ),
+    );
   }
 }
 
@@ -51,12 +85,49 @@ class Contact {
   final int id;
   final String name;
 
-  final double diffX, diffY;
+  final Position pos;
+  void Function() onTap;
+  
+  bool isSelected;
 
   Contact({
     required this.id,
     required this.name,
-    required this.diffX,
-    required this.diffY
+    required this.pos,
+    required this.onTap,
+    this.isSelected = false,
   });
+
+  Widget widget(){
+    return Positioned(
+      left: pos.left,
+      right: pos.right,
+      bottom: pos.bottom,
+      top: pos.top,
+      
+      child: GestureDetector(
+        onTap: onTap,
+
+        child: Stack(
+          children: [
+            Icon(
+              Icons.circle,
+              size: 14,
+              color: isSelected 
+                ?AppColors.selectedContactColor
+                :AppColors.unselectedContactColor,
+            ),
+            const Positioned(
+              top: 2,
+              left: 2,
+              child: Icon(
+                Icons.circle,
+                size: 10,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
