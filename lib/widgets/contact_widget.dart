@@ -35,18 +35,14 @@ class ContactWidget extends StatelessWidget {
                 ? selectedContactColor
                 : unselectedContactColor,
             ),
-            const Icon(
+            const Positioned(
+              top: 2,
+              left: 2,
+              child: Icon(
                 Icons.circle,
                 size: 10,
+              ),
             ),
-            // const Positioned(
-            //   top: 2,
-            //   left: 2,
-              // child: Icon(
-              //   Icons.circle,
-              //   size: 10,
-              // ),
-            // ),
           ],
         ),
       ),

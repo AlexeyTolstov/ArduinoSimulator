@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 
 class WireWidget extends StatelessWidget {
   final Wire wire;
-  void Function(Wire) onTap;
+  final void Function(Wire) onTap;
 
-  WireWidget({
+  const WireWidget({
     super.key,
     required this.wire,
     required this.onTap
@@ -14,20 +14,15 @@ class WireWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: wire.firstCoord.x,
-      top: wire.firstCoord.y,
-      
+      left: wire.firstCoord.x - (wire.sizeIcon / 2),
+      top: wire.firstCoord.y - (wire.sizeIcon / 2),
       child: Transform.rotate(
         angle: wire.getAngle(),
-        child: GestureDetector(
-          onTap: () {
-            onTap(wire);
-          },
-          child: Container(
-            width: wire.getHypotenuse(),
-            height: wire.strokeWidth,
-            color: wire.wireColor,
-          ),
+        alignment: Alignment.topLeft,
+        child: Container(
+          width: wire.getHypotenuse(),
+          height: 3,
+          color: Colors.red,
         ),
       )
     );

@@ -24,7 +24,7 @@ class Device {
     this.coordination = const Coordination(x: 0, y: 0),
     this.isDragged = false,
   }) {
-    widthImage = image.width ?? 0;
-    heightImage = image.height ?? 0;
+    widthImage = size.width;
+    heightImage = size.height;
   }
 }

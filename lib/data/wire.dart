@@ -13,21 +13,25 @@ class Wire {
 
   final Color wireColor;
   final double strokeWidth;
+  final double sizeIcon;
 
   @override
   String toString() =>  "First coordination: $firstCoord\n"
                         "Second coordination:  $secondCoord";
 
-  double getHypotenuse() => sqrt(pow(deltaX, 2) + pow(deltaY, 2)) + strokeWidth;
-  double getAngle() => atan2(deltaY, deltaX) * 180 / pi;
+  double getHypotenuse() => sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+  double getAngle() => atan2(deltaY, deltaX);
 
   Wire({
     required this.firstCoord,
     required this.secondCoord,
     this.wireColor = Colors.red,
     this.strokeWidth = 5,
+    this.sizeIcon = 14,
   }){
-    deltaX = firstCoord.x - secondCoord.x;
-    deltaY = firstCoord.y - secondCoord.y;
+    deltaX = secondCoord.x - firstCoord.x + sizeIcon;
+    
+    deltaY = secondCoord.y - firstCoord.y + sizeIcon;
+    print("$deltaX");
   }
 }

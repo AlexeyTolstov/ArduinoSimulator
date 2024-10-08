@@ -31,7 +31,12 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
           changeSelected(c.contactId);
         };
     }).toList(),
-    "Arduino Uno": []
+    "ArduinoUno": DeviceContacts.arduinoUnoContacts.map((Contact c) {
+      return c
+        ..onTap = () {
+          changeSelected(c.contactId);
+        };
+    }).toList(),
   };
 
   late List<Device> devicesList = [
@@ -45,8 +50,8 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
     Device(
       image: AppDevicesImages.arduinoUno,
       title: "Arduino Uno",
-      nameDevice: "Arduino Uno",
-      contacts: contacts["Arduino Uno"]!,
+      nameDevice: "ArduinoUno",
+      contacts: contacts["ArduinoUno"]!,
       size: const Size(510, 380)
     ),
   ];
@@ -175,6 +180,7 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                       },
                     ),
                     ...wireNameList.map((List<ContactId> c) {
+                      print(wireNameList);
                       Coordination? first;
                       Coordination? second;
 
@@ -183,8 +189,8 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                           for (Contact i in device.contacts){
                             if (c[0].nameContact == i.contactId.nameContact) {
                               first = Coordination(
-                                x: device.coordination.x + (i.pos.left ?? (-i.pos.right! + device.widthImage)),
-                                y: device.coordination.y + (i.pos.top ?? (-i.pos.bottom! + device.heightImage+100)),
+                                x: device.coordination.x + (i.pos.left ?? (-i.pos.right! + device.size.width)),
+                                y: device.coordination.y + (i.pos.top ?? (-i.pos.bottom! + device.size.height)),
                               );
                               break;
                             }
@@ -195,28 +201,24 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                             if (c[1].nameContact == i.contactId.nameContact) {
                               second = Coordination(
                                 x: device.coordination.x + (i.pos.left ?? (-i.pos.right! + device.widthImage)),
-                                y: device.coordination.y + (i.pos.top ?? (-i.pos.bottom! + device.heightImage+100)),
+                                y: device.coordination.y + (i.pos.top ?? (-i.pos.bottom! + device.heightImage)),
                               );
                               break;
                             }
                           }
                         }
                       }
-
-                      if (first! < second!){
-                        (first, second) = (second, first);
-                      }
-
+                      
                       return WireWidget(
                         onTap: (Wire wire) {
                           wireNameList.removeWhere((element) => 
-                            (element[0] == c[0] || element[0] == c[1]) &&
-                            (element[1] == c[0] || element[1] == c[1]));
+                            (element[0] == c[0] && element[1] == c[1]) ||
+                            (element[0] == c[1] && element[1] == c[0]));
                           setState(() {});
                         },
                         wire: Wire(
-                          firstCoord: first,
-                          secondCoord: second,
+                          firstCoord: first!,
+                          secondCoord: second!,
                         )
                       );
                     }),
