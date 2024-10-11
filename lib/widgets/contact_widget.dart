@@ -1,4 +1,5 @@
 import 'package:arduino_simulator_test/data/contact.dart';
+import 'package:arduino_simulator_test/styles/contact.dart';
 import 'package:flutter/material.dart';
 
 
@@ -29,8 +30,8 @@ class ContactWidget extends StatelessWidget {
         child: Stack(
           children: [
             Icon(
-              Icons.circle,
-              size: 14,
+              ContactStyle.shape,
+              size: ContactStyle.size + ContactStyle.border,
               color: contactData.isSelected 
                 ? selectedContactColor
                 : unselectedContactColor,
@@ -39,8 +40,8 @@ class ContactWidget extends StatelessWidget {
               top: 2,
               left: 2,
               child: Icon(
-                Icons.circle,
-                size: 10,
+                ContactStyle.shape,
+                size: ContactStyle.size,
               ),
             ),
           ],

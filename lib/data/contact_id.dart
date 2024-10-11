@@ -1,6 +1,9 @@
+int lastId = 0;
+
 class ContactId {
   final String nameDevice;
   final String nameContact;
+  late final int id;
 
   @override
   bool operator ==(covariant ContactId other) {
@@ -11,10 +14,12 @@ class ContactId {
   int get hashCode => Object.hash(nameDevice, nameContact);
 
   @override
-  String toString() => "$nameDevice/$nameContact";
+  String toString() => "$nameDevice/$nameContact: $id";
 
   ContactId({
     required this.nameDevice,
     required this.nameContact,
-  });
+  }) {
+    id = lastId++;
+  }
 }
