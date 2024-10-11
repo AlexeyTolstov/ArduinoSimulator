@@ -16,7 +16,6 @@ import 'package:arduino_simulator_test/widgets/wire_widget.dart';
 
 import 'package:arduino_simulator_test/device/device_contacts.dart';
 
-
 class ConnectDevicesPage extends StatefulWidget {
   const ConnectDevicesPage({super.key});
 
@@ -57,13 +56,12 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
         size: const Size(510, 370)),
   ];
 
-  List<List<ContactId>> wireNameList = [];
+  List<WireContacts> wireContactsList = [];
 
   void removeWireWidgetDragging(String nameDevice) {
-    for (int i = wireNameList.length - 1; i >= 0; i--) {
-      if (wireNameList[i][0].nameDevice == nameDevice ||
-          wireNameList[i][1].nameDevice == nameDevice) {
-        wireNameList.removeAt(i);
+    for (WireContacts wireContacts in wireContactsList) {
+      if (wireContacts.isRemovingDevice(nameDevice)) {
+        wireContactsList.remove(wireContacts);
       }
     }
   }
@@ -77,7 +75,22 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
       } else if (selectedContactId == null) {
         selectedContactId = contactId;
       } else {
-        wireNameList.add([contactId, selectedContactId!]);
+        bool isHave = false;
+        for (WireContacts wireContacts in wireContactsList) {
+          if (isHave) break;
+
+          if ((wireContacts.first == contactId &&
+                  wireContacts.second == selectedContactId) ||
+              (wireContacts.first == selectedContactId &&
+                  wireContacts.second == contactId)) {
+            isHave = true;
+          }
+        }
+        if (!isHave) {
+          wireContactsList
+              .add(WireContacts(first: contactId, second: selectedContactId!));
+        }
+
         selectedContactId = null;
       }
 
@@ -97,7 +110,7 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
       for (Device device in devicesList) {
         device.isDragged = false;
       }
-      wireNameList.clear();
+      wireContactsList.clear();
     });
   }
 
@@ -142,8 +155,8 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                                         AppBar().preferredSize.height);
 
                                 if (!device.isDragged) {
-                                  setState(() =>
-                                      removeWireWidgetDragging(device.nameDevice));
+                                  setState(() => removeWireWidgetDragging(
+                                      device.nameDevice));
                                 }
                               });
                             },
@@ -183,8 +196,8 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                                 );
 
                                 if (!device.isDragged) {
-                                  setState(() =>
-                                      removeWireWidgetDragging(device.nameDevice));
+                                  setState(() => removeWireWidgetDragging(
+                                      device.nameDevice));
                                 }
                               });
                             },
@@ -193,15 +206,16 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                         );
                       },
                     ),
-                    ...wireNameList.map(
-                      (List<ContactId> c) {
+                    ...wireContactsList.map(
+                      (WireContacts wireContacts) {
                         Coordination? first;
                         Coordination? second;
 
                         for (Device device in devicesList) {
-                          if (c[0].nameDevice == device.nameDevice) {
+                          if (wireContacts.first.nameDevice ==
+                              device.nameDevice) {
                             for (Contact i in device.contacts) {
-                              if (c[0].nameContact == i.contactId.nameContact) {
+                              if (wireContacts.first.id == i.contactId.id) {
                                 first = Coordination(
                                   x: device.coordination.x +
                                       (i.pos.left ??
@@ -217,9 +231,10 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                               }
                             }
                           }
-                          if (c[1].nameDevice == device.nameDevice) {
+                          if (wireContacts.second.nameDevice ==
+                              device.nameDevice) {
                             for (Contact i in device.contacts) {
-                              if (c[1].nameContact == i.contactId.nameContact) {
+                              if (wireContacts.second.id == i.contactId.id) {
                                 second = Coordination(
                                   x: device.coordination.x +
                                       (i.pos.left ??
@@ -239,9 +254,11 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
 
                         return WireWidget(
                           onTap: (Wire wire) {
-                            wireNameList.removeWhere((element) =>
-                                (element[0] == c[0] && element[1] == c[1]) ||
-                                (element[0] == c[1] && element[1] == c[0]));
+                            wireContactsList.removeWhere((element) =>
+                                (element.first == wireContacts.first &&
+                                    element.second == wireContacts.second) ||
+                                (element.first == wireContacts.second &&
+                                    element.second == wireContacts.first));
                             setState(() {});
                           },
                           wire: Wire(

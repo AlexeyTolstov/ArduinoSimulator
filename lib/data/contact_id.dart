@@ -7,7 +7,7 @@ class ContactId {
 
   @override
   bool operator ==(covariant ContactId other) {
-    return nameDevice == other.nameDevice && nameContact == other.nameContact;
+    return nameDevice == other.nameDevice && nameContact == other.nameContact && id == other.id;
   }
 
   @override

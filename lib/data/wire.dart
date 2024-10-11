@@ -1,9 +1,20 @@
 import 'dart:math';
 
+import 'package:arduino_simulator_test/data/contact_id.dart';
 import 'package:arduino_simulator_test/styles/contact.dart';
 import 'package:flutter/material.dart';
 import 'package:arduino_simulator_test/data/coord.dart';
 
+class WireContacts {
+  final ContactId first;
+  final ContactId second;
+
+  bool isRemovingDevice(String nameDevice) {
+    return first.nameDevice == nameDevice || second.nameDevice == nameDevice;
+  }
+
+  WireContacts({required this.first, required this.second});
+}
 
 class Wire {
   final Coordination firstCoord;
@@ -17,11 +28,11 @@ class Wire {
   final double sizeIcon;
 
   @override
-  String toString() =>  "First coordination: $firstCoord\n"
-                        "Second coordination:  $secondCoord";
+  String toString() => "First coordination: $firstCoord\n"
+      "Second coordination:  $secondCoord";
 
-  double getHypotenuse() => sqrt(pow(deltaX, 2) + pow(deltaY, 2)); 
-  double getAngle() =>  atan2(deltaY, deltaX);
+  double getHypotenuse() => sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+  double getAngle() => atan2(deltaY, deltaX);
 
   Wire({
     required this.firstCoord,
@@ -29,7 +40,7 @@ class Wire {
     this.wireColor = Colors.red,
     this.strokeWidth = 3,
     this.sizeIcon = ContactStyle.borderSize,
-  }){
+  }) {
     deltaX = secondCoord.x - firstCoord.x;
     deltaY = secondCoord.y - firstCoord.y;
   }
