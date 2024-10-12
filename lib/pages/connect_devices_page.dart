@@ -146,13 +146,13 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                             child: ItemWidget(device: device),
                             onDragEnd: (details) {
                               setState(() {
-                                device.isDragged = device.coordination.x > 0;
-
                                 device.coordination = Coordination(
                                     x: details.offset.dx -
                                         MediaQuery.sizeOf(context).width / 4,
                                     y: details.offset.dy -
                                         AppBar().preferredSize.height);
+
+                                device.isDragged = device.coordination.x > 0;
 
                                 if (!device.isDragged) {
                                   setState(() => removeWireWidgetDragging(
@@ -186,7 +186,6 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                             childWhenDragging: Container(),
                             onDragEnd: (details) {
                               setState(() {
-                                device.isDragged = device.coordination.x > 0;
 
                                 device.coordination = Coordination(
                                   x: details.offset.dx -
@@ -195,6 +194,8 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                                       AppBar().preferredSize.height,
                                 );
 
+                                device.isDragged = device.coordination.x > 0;
+                                
                                 if (!device.isDragged) {
                                   setState(() => removeWireWidgetDragging(
                                       device.nameDevice));
