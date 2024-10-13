@@ -7,7 +7,11 @@ class ContactId {
 
   @override
   bool operator ==(covariant ContactId other) {
-    return nameDevice == other.nameDevice && nameContact == other.nameContact && id == other.id;
+    return nameDevice == other.nameDevice && nameContact == other.nameContact;
+  }
+
+  bool isSame(ContactId other){
+    return nameDevice == other.nameDevice && nameContact == other.nameContact && id == other.id; 
   }
 
   @override

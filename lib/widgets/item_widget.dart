@@ -18,9 +18,12 @@ class ItemWidget extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 200,
-            height: 200,
-            child: device.image
+            width: 150,
+            height: 150,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: device.image,
+            )
           ),
           Expanded(
             child: Text(

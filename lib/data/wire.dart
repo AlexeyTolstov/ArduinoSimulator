@@ -13,7 +13,16 @@ class WireContacts {
     return first.nameDevice == nameDevice || second.nameDevice == nameDevice;
   }
 
-  WireContacts({required this.first, required this.second});
+  @override
+  bool operator ==(covariant WireContacts other) {
+    return (other.first == first && other.second == second) ||
+        (other.first == second && other.second == first);
+  }
+
+  @override
+  String toString() => "$first $second";
+
+  WireContacts({required this.first, required this.second});  
 }
 
 class Wire {

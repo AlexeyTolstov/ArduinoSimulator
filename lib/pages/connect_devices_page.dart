@@ -1,3 +1,5 @@
+import 'package:arduino_simulator_test/data/answer_wire.dart';
+import 'package:arduino_simulator_test/device/answer_data.dart';
 import 'package:flutter/material.dart';
 
 import 'package:arduino_simulator_test/data/contact.dart';
@@ -24,6 +26,7 @@ class ConnectDevicesPage extends StatefulWidget {
 }
 
 class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
+  // Выбранный контакт
   ContactId? selectedContactId;
 
   late Map<String, List<Contact>> contacts = {
@@ -43,17 +46,19 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
 
   late List<Device> devicesList = [
     Device(
-        image: AppDevicesImages.lightRedOff,
-        title: "Красный светодиод",
-        nameDevice: "Light",
-        contacts: contacts["Light"]!,
-        size: const Size(42, 100)),
+      image: AppDevicesImages.lightRedOff,
+      title: "Красный светодиод",
+      nameDevice: "Light",
+      contacts: contacts["Light"]!,
+      size: const Size(42, 100),
+    ),
     Device(
-        image: AppDevicesImages.arduinoUno,
-        title: "Arduino Uno",
-        nameDevice: "ArduinoUno",
-        contacts: contacts["ArduinoUno"]!,
-        size: const Size(510, 370)),
+      image: AppDevicesImages.arduinoUno,
+      title: "Arduino Uno",
+      nameDevice: "ArduinoUno",
+      contacts: contacts["ArduinoUno"]!,
+      size: const Size(510, 370),
+    ),
   ];
 
   List<WireContacts> wireContactsList = [];
@@ -66,26 +71,33 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void changeSelected(ContactId? contactId) {
     setState(() {
-      if (selectedContactId == contactId) {
-        selectedContactId = null;
-      } else if (contactId == null) {
-        selectedContactId = null;
-      } else if (selectedContactId == null) {
+      // Выделили контакт
+      if (selectedContactId == null) {
         selectedContactId = contactId;
-      } else {
-        bool isHave = false;
-        for (WireContacts wireContacts in wireContactsList) {
-          if (isHave) break;
+      }
 
-          if ((wireContacts.first == contactId &&
-                  wireContacts.second == selectedContactId) ||
-              (wireContacts.first == selectedContactId &&
-                  wireContacts.second == contactId)) {
-            isHave = true;
-          }
-        }
+      // Сняли выделение
+      else if (contactId == null || selectedContactId!.isSame(contactId)) {
+        selectedContactId = null;
+      }
+
+      // Добавляем провод между контактами
+      else {
+        // Проверка на наличие такого контакта
+        bool isHave = wireContactsList.any((WireContacts wireContacts) =>
+            (wireContacts.first.isSame(contactId) &&
+                wireContacts.second.isSame(selectedContactId!)) ||
+            (wireContacts.first.isSame(selectedContactId!) &&
+                wireContacts.second.isSame(contactId)));
+
+        // Если не найден контакт, добавляем
         if (!isHave) {
           wireContactsList
               .add(WireContacts(first: contactId, second: selectedContactId!));
@@ -94,22 +106,34 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
         selectedContactId = null;
       }
 
-      for (final el in contacts.entries) {
-        List<Contact> contacts = el.value;
+      for (final entry in contacts.entries) {
+        List<Contact> contacts = entry.value;
 
         for (Contact contact in contacts) {
           contact.isSelected = selectedContactId != null &&
-              contact.contactId == selectedContactId;
+              contact.contactId.isSame(selectedContactId!);
         }
       }
     });
   }
 
+  void resetDevice() {
+    for (Device device in devicesList) {
+      resetContacts(device.nameDevice);
+      device.isDragged = false;
+    }
+  }
+
+  void resetContacts(String nameDevice) {
+    List<Contact> contactsList = contacts[nameDevice]!;
+    for (Contact contact in contactsList) {
+      contact.isSelected = false;
+    }
+  }
+
   void resetItems() {
     setState(() {
-      for (Device device in devicesList) {
-        device.isDragged = false;
-      }
+      resetDevice();
       wireContactsList.clear();
     });
   }
@@ -118,7 +142,20 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Simulator"),
+        title: Row(
+          children: [
+            const Text("Simulator"),
+            IconButton(
+                onPressed: () {
+                  if (Answer(answerContacts: wireContactsList) == blinkLight) {
+                    print("Пользователь молодец");
+                  } else {
+                    print("Пользователь Рукожоп");
+                  }
+                },
+                icon: const Icon(Icons.accessible))
+          ],
+        ),
       ),
       floatingActionButton: IconButton(
         icon: const Icon(Icons.restore),
@@ -155,6 +192,7 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                                 device.isDragged = device.coordination.x > 0;
 
                                 if (!device.isDragged) {
+                                  resetContacts(device.nameDevice);
                                   setState(() => removeWireWidgetDragging(
                                       device.nameDevice));
                                 }
@@ -186,7 +224,6 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                             childWhenDragging: Container(),
                             onDragEnd: (details) {
                               setState(() {
-
                                 device.coordination = Coordination(
                                   x: details.offset.dx -
                                       MediaQuery.sizeOf(context).width / 4,
@@ -195,8 +232,9 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
                                 );
 
                                 device.isDragged = device.coordination.x > 0;
-                                
+
                                 if (!device.isDragged) {
+                                  resetContacts(device.nameDevice);
                                   setState(() => removeWireWidgetDragging(
                                       device.nameDevice));
                                 }
